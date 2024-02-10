@@ -3,7 +3,7 @@ const palabrasClave = [
     "clave",
     "confirmación",
     "datos",
-    "codigo",
+    "código",
     "verificar cuenta",
     "actualizar información",
     "haz clic aquí",
@@ -11,6 +11,29 @@ const palabrasClave = [
     "verifica",
     "update",
     "notificación",
+    "urgente",
+    "acceso restringido",
+    "información de pago",
+    "tarjeta de crédito",
+    "cuenta suspendida",
+    "actividad sospechosa",
+    "seguridad",
+    "alerta de seguridad",
+    "confirma tu identidad",
+    "acceso bloqueado",
+    "recompensa",
+    "oferta limitada",
+    "riesgo de cuenta",
+    "información bancaria",
+    "detalles de la cuenta",
+    "validación requerida",
+    "error de sistema",
+    "problema con tu cuenta",
+    "revisa tu cuenta",
+    "cambiar contraseña",
+    "actualización obligatoria",
+    "verificación de identidad",
+    "información personal",
     // ... otras palabras clave ...
 ];
 
@@ -124,7 +147,6 @@ function escanearCorreoDetalle() {
         notification.classList.remove("custom-notification");
         notification.classList.remove("alert-notification");
 
-
         // Mostramos la notificación inicial "Analizando el Contenido..."
         notification.innerHTML = `
             <strong>Analizando el Contenido...</strong><br>
@@ -184,11 +206,34 @@ function escanearCorreoDetalle() {
     }
 }
 
+function startGmailJs(gmail) {
+    window.gmail = gmail;
+    gmail.observe.on("load", () => {
+        const userEmail = gmail.get.user_email();
+        console.log(
+            "Hello, " + userEmail + ". This is your extension talking!"
+        );
+        gmail.observe.on("view_email", (domEmail) => {
+            console.log("Looking at email:", domEmail);
+            const emailData = gmail.new.get.email_data(domEmail);
+            console.log("Email data:", emailData);
+        });
+        gmail.observe.on("compose", (compose) => {
+            console.log("New compose window is opened!", compose);
+        });
+    });
+}
+
 const observer = new MutationObserver((mutationsList, observer) => {
     for (let mutation of mutationsList) {
         if (mutation.type === "childList") {
             marcarCorreosSospechosos();
             escanearCorreoDetalle();
+            //de momento lo dejo aquì pero hay que verificar si hay que moverlo
+            if (!window._gmailjs) {
+                return;
+            }
+            startGmailJs(window._gmailjs);
         }
     }
 });
